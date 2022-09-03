@@ -1,0 +1,51 @@
+---
+title: dplyr tutorial
+format: html
+---
+
+```{r Setup}
+# Setup
+library(tidyverse)
+```
+
+```{r across()}
+# across()
+starwars %>% 
+  summarise(across(height:mass, mean, na.rm = TRUE))
+
+starwars %>% 
+  summarise(across(where(is.numeric), median, na.rm = TRUE))
+
+# More than one function
+starwars %>% 
+  summarise(across(where(is.numeric),
+                   list(min = min, max = max, mean = mean),
+                   na.rm = TRUE))
+
+# Function syntax
+starwars %>% 
+  summarise(across(where(is.numeric),
+                   list( ~ min(.x, na.rm = TRUE),
+                         ~ max(.x, na.rm = TRUE),
+                         ~ mean(.x, na.rm = TRUE))))
+
+# Find # of unique values in character variables
+summary(starwars)
+
+starwars %>% 
+  summarise(length(unique(hair_color)))
+
+starwars %>% distinct(hair_color) %>% count() #nrow()
+
+starwars %>% 
+  summarise(across(where(is.character), ~ length(unique(.x))))
+
+starwars %>% 
+  group_by(species) %>% 
+  filter(n() > 1) %>% 
+  summarise(across(c(sex, gender, homeworld),
+                   ~ length(unique(.x))),
+            n = n())
+
+```
+
