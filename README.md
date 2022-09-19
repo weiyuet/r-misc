@@ -1,2 +1,2 @@
 ## r-misc
-Placeholder for `fun random` practice stuff!
+Placeholder for `fun random` practice stuff.
