@@ -93,17 +93,34 @@ starwars %>%
 
 ```{r rownames_to_column()}
 state.x77 %>% 
-  as.data.frame() %>% 
-  rownames_to_column('State') %>% 
+  as.data.frame() %>%
+  rownames_to_column("state") %>% 
   as_tibble()
 ```
 
 ```{r distinct()}
 starwars %>%
   distinct(homeworld, species)
+
+starwars %>% 
+  count(homeworld, species)
 ```
 
 ```{r rowwise()}
+fruits <- tribble(
+  ~"fruit", ~"height_1", ~"height_2", ~"height_3", ~"width", ~"weight",
+  "Banana", 4, 4.2, 3.5, 1, 0.5,
+  "Strawberry", 1, 0.9, 1.2, 1, 0.25,
+  "Pineapple", 18, 17.7, 19.2, 6, 3
+  )
+
+fruits %>% 
+  rowwise(fruit) %>% 
+  mutate(height_mean = mean(height_1:height_3))
+
+fruits %>% 
+  rowwise(fruit) %>% 
+  mutate(height_mean = mean(c_across(contains("height"))))
 
 ```
 
