@@ -1,4 +1,4 @@
-# Load libraries
+# Setup
 library(lattice)
 
 # Load data

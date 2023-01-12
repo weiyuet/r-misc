@@ -1,0 +1,85 @@
+---
+title: purrr tutorial
+date: 2023-01-10
+output: html_document
+---
+
+```{r Setup}
+library(tidyverse)
+library(janitor)
+```
+
+```{r Eg.1 map() map_dbl() and unlist()}
+# airquality data set is pre-loaded with R
+head(airquality)
+
+# Column names to lower case
+airquality <- airquality %>% 
+  clean_names()
+
+# Create function to convert F to C
+FtoC <- function(F){
+  C <- (F - 32)*5/9
+  return(C)
+}
+
+# Test the function
+FtoC(F = 63) # or FtoC(63)
+
+# map() is one of the workhorse functions in purrr
+map(.x = airquality$Temp,
+    .f = FtoC) # map() always returns a list
+
+# better to combine map() with mutate() and create a new column
+airquality <- airquality %>% 
+  mutate(temp_c = map(temp, FtoC)) # map() still returns a list
+
+# use unlist() or map_dbl()
+# ...mutate(temp_c = map(temp, FtoC),
+#           temp_c = unlist(temp_c))
+
+airquality <- airquality %>% 
+  mutate(temp_c = map_dbl(temp, FtoC))
+```
+
+```{r Eg.2 mean() and map()}
+# Create function to compute mean after removing missing values
+my_mean <- function(x){
+  mean(x, na.rm = TRUE)
+}
+
+# Compute mean of ozone, solar, wind and temp
+airquality %>% 
+  select(ozone:temp) %>% 
+  map(., my_mean) %>%
+  unlist()
+
+# map() returns a list
+# map_dbl() returns a vector
+```
+
+```{r Eg.3 map2() + plot}
+# Create histogram function
+histogram <- function(data, var){
+  theme_set(theme_bw())
+  
+  plot <- ggplot(data,
+                 aes(x = .data[[var]])) +
+    geom_histogram(colour = "white",
+                   fill = "lightblue",
+                   binwidth = function(x)2*IQR(x) / (length(x)^(1/3)))
+  
+  return(plot)
+}
+
+# Select variables to plot
+airquality_num <- airquality %>% 
+  select(ozone:temp)
+
+# Plot histograms
+histograms <- map2(.x = list(airquality_num),
+                   .y = names(airquality_num),
+                   .f = histogram)
+
+histograms
+```
